@@ -344,11 +344,14 @@ def extract_footer_text(
     except Exception:
         pass
     return txt
+
+
 def trim_cols(out):
     filename = out
     df = pd.read_csv(filename)
     df.drop(columns=["inferred_boroughs_from_pdf"], inplace=True)
     df.to_csv(out, index=False)
+
 
 def build_ad_borough_map():
     df = pd.read_csv("../data/ed_manifest/ed_borough_map.csv")
@@ -358,6 +361,7 @@ def build_ad_borough_map():
     print(unique_pairs_df)
 
     unique_pairs_df.to_csv("../data/ed_manifest/ad_borough_map.csv", index=False)
+
 
 def main():
     ap = argparse.ArgumentParser(
@@ -448,9 +452,6 @@ def main():
 
     # Uncomment to remove excess inferred_boroughs_from_pdf column
     trim_cols(args.out)
-    
-    # Uncomment to remove excess inferred_boroughs_from_pdf column
-    # build_ad_borough_map()
 
 
 if __name__ == "__main__":
