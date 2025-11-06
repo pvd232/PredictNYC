@@ -1,0 +1,215 @@
+\documentclass[11pt]{article}
+
+% ---------- Packages ----------
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\usepackage{parskip}
+\usepackage{amsmath, amssymb, amsthm}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{hyperref}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{float}
+\hypersetup{colorlinks=true, linkcolor=black, urlcolor=blue, citecolor=black}
+
+\setstretch{1.07}
+
+% ---------- Colors ----------
+\definecolor{MamdaniBlue}{HTML}{1F77B4} % blue
+\definecolor{CuomoOrange}{HTML}{FF7F0E} % orange
+\definecolor{SliwaRed}{HTML}{D62728}    % red
+\definecolor{SoftGray}{gray}{0.35}
+
+% ---------- Macros ----------
+\newcommand{\logit}{\operatorname{logit}}
+\newcommand{\ED}{\text{ED}}    % Election District
+\newcommand{\EV}{\text{EV}}    % Early Vote
+\newcommand{\R}{\text{R}}      % Remaining / Election Day
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\vect}[1]{\mathbf{#1}}
+
+\title{NYC 2025 Mayoral Election Forecast Model:\\
+Two-Compartment Multinomial Ridge with Offsets}
+\author{Peter Driscoll}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\section*{Purpose}
+This document is the authoritative specification for the NYC 2025 mayoral forecast. It defines the target, model form, priors, features, turnout assumptions, estimation, calibration, and outputs. It is the single source of truth for implementation and communication.
+
+\section{Objective and Unit of Analysis}
+\textbf{Target:} Election District (ED)--level \emph{vote shares} for three candidates
+\(\{k\}=\{\text{Mamdani}, \text{Cuomo}, \text{Sliwa}\}\), aggregatable to AD/borough/city.
+We forecast \emph{shares} (not totals). Turnout is used to shape composition and aggregation weights, not to directly predict counts.
+
+\section{Model Overview}
+We model two disjoint ``compartments'' per ED \(i\):
+\(\EV\) (banked early voters) and \(\R\) (remaining/Election Day voters).
+Within each compartment we use a multinomial logistic model with an offset prior, then mix the two by their ED-specific turnout weights.
+
+\subsection{Compartment models (per candidate \(k\))}
+\begin{align}
+\eta^{(c)}_{ik} &= o_{ik} \;+\; \gamma^{(c)}_{k} \;+\; \vect{\beta}_{k}^{\top}\vect{x}^{(c)}_{i},
+\qquad c\in\{\EV,\R\}, \label{eq:linpred}\\
+p^{(c)}_{ik} &= \frac{\exp\big(\eta^{(c)}_{ik}\big)}{\sum_{\ell}\exp\big(\eta^{(c)}_{i\ell}\big)}, \qquad
+\sum_{k} p^{(c)}_{ik} = 1. \label{eq:softmax}
+\end{align}
+
+\subsection{Two-compartment mixture to ED-level share}
+Let \(T_i\) be the projected total turnout for ED \(i\) under a turnout scenario (Sec.~\ref{sec:turnout}).
+Define weights
+\[
+w^{\EV}_i = \frac{\EV_{25,i}}{T_i}, \qquad
+w^{\R}_i = 1 - w^{\EV}_i.
+\]
+The predicted ED share is
+\begin{equation}
+p_{ik} = w^{\EV}_i \, p^{(\EV)}_{ik} \;+\; w^{\R}_i \, p^{(\R)}_{ik},
+\qquad \sum_k p_{ik}=1.
+\end{equation}
+
+\section{Offsets (Pattern Priors)}
+Offsets \(o_{ik}\) anchor spatial patterns using the freshest and most relevant signals.
+\begin{itemize}[leftmargin=1.25em]
+  \item \textbf{Mamdani:} \(o_{iM}=\logit\big(\text{Dem-primary Mamdani share in ED } i\big)\).
+  \item \textbf{Cuomo:} \(o_{iC}=0\) (no direct Democratic-primary analog; learns from features and calibration).
+  \item \textbf{Sliwa (weak stabilizer):} \(o_{iS}=\alpha_S\,\logit\big(\text{Sliwa 2021 share in ED } i\big)\) with small \(\alpha_S\) to avoid over-weighting history while providing a plausible GOP spatial pattern.
+\end{itemize}
+All non-offset effects are shrunk via ridge (L2) to promote stability with small, noisy tabular data.
+
+\section{Turnout Scenarios and Weights}
+\label{sec:turnout}
+We do not directly model totals. Instead, turnout shapes composition and aggregation via \(T_i\) and the compartment weights.
+\begin{itemize}[leftmargin=1.25em]
+  \item \textbf{Total turnout scenarios:} \(T \in \{1.80\text{M},\,1.94\text{M}\}\).
+  \item \textbf{Cannibalization of E-Day by EV:} \(\rho \in \{0.4, 0.6\}\) is the fraction of 2021 Election Day volume cannibalized by 2025 EV.
+  \item \textbf{Per-ED projection:} Let \( \text{EDay21}_i=\text{Total21}_i - \EV_{21,i}\).
+  Define
+  \[
+  \widehat{\text{EDay25}}_i \;=\; (1-\rho)\, s \cdot \text{EDay21}_i,
+  \]
+  where \(s\) scales so that \(\sum_i \big(\EV_{25,i}+\widehat{\text{EDay25}}_i\big)=T\).
+  Then \(T_i=\EV_{25,i}+\widehat{\text{EDay25}}_i\) and
+  \(w^{\EV}_i=\EV_{25,i}/T_i,\; w^{\R}_i=1-w^{\EV}_i\).
+\end{itemize}
+
+\section{Feature Sets (MECE by compartment)}
+All features are standardized (z-scores). Use a compact set to avoid collinearity; ridge will shrink noisy terms.
+
+\subsection*{EV compartment (banked voters): \(\vect{x}^{(\EV)}_i\)}
+\begin{itemize}[leftmargin=1.25em]
+  \item \(\text{youth\_prop}_i\): ACS share age 18--29.
+  \item \(\text{student\_share}_i\) \emph{or} \(\text{near\_campus}_i\) (choose one).
+  \item \(\%\text{EV\_newly\_registered}_i\) (best) \emph{or} \(\text{new\_reg\_rate}_i = \frac{\text{new regs 2024--25}}{\text{registrants}}\).
+  \item \(\text{income\_above\_median}_i\) (or tract income percentile).
+  \item Optional access: \(\text{ev\_site\_near}_i\) or distance.
+\end{itemize}
+
+\subsection*{Remaining / E-Day compartment: \(\vect{x}^{(\R)}_i\)}
+\begin{itemize}[leftmargin=1.25em]
+  \item \(\text{income\_below\_median}_i\) (complement to EV).
+  \item \(\text{remaining\_gap}_i = \text{target\_bin\_EV\_rate} - \text{ED\_EV\_rate}_i\) (who has not voted yet).
+  \item \(\text{renter\_share}_i\) \emph{or} \(\text{recent\_mover\_share}_i\) (pick one).
+  \item Retain \(\text{youth\_prop}_i\) (late youth may vote on E-Day).
+\end{itemize}
+
+\subsection*{Candidate-specific stabilizer}
+\begin{itemize}[leftmargin=1.25em]
+  \item \textbf{Sliwa only:} \(\text{gop\_base}_i = \text{Sliwa2021\_share}_i\) with strong shrinkage (tiny ridge effect).
+\end{itemize}
+
+\section{Estimation and Regularization}
+We fit ridge-penalized multinomial logits in each compartment (or a single model with EV/E-Day interactions if preferred operationally). Choose the ridge parameter \(\lambda\) via \emph{spatial cross-validation} (folds grouped by AD or borough) to prevent leakage from neighboring EDs.
+
+\section{Poll Anchoring (Citywide Calibration)}
+Let \(\bar p_k\) be the turnout-weighted citywide mean:
+\[
+\bar p_k \;=\; \frac{\sum_i T_i\, p_{ik}}{\sum_i T_i}.
+\]
+We apply small intercept shifts to \(\gamma^{(\EV)}_k\) and/or \(\gamma^{(\R)}_k\) (or a shared \(\gamma_k\)) so that \(\bar p_k\) matches the latest polling averages.\\
+\emph{Soft Sliwa prior (count-to-share):} historical \(\approx 316\text{k}\) votes implies \(\sim 16\%{-}18\%\) share when \(T \in [1.80, 1.94]\)M; we encode this as a weak citywide penalty on \(\bar p_S\) (polls remain the primary anchor).
+
+\section{Uncertainty and Simulation}
+We quantify uncertainty via:
+\begin{itemize}[leftmargin=1.25em]
+  \item Bootstrap over EDs (resampling rows).
+  \item A shared citywide shock added to linear predictors to induce correlation across EDs.
+\end{itemize}
+We run simulations across the grid \((T,\rho)\in\{1.80,1.94\}\times\{0.4,0.6\}\) and report 50\% and 90\% intervals for ED/AD/borough/city aggregates.
+
+\section{Data Inputs (Outstanding)}
+\begin{enumerate}[leftmargin=1.25em]
+  \item Democratic primary by ED (votes and shares).
+  \item EV 2025 by site/day (allocated to ED) and EV 2021.
+  \item Registration: current totals; new registrations 2024--25; party mix if available.
+  \item ACS: age 18--29; student share or near-campus flag; income variable.
+  \item Sliwa 2021 share by ED (or GOP registration share).
+  \item Numeric polling averages for Mamdani, Cuomo, Sliwa (used in calibration).
+\end{enumerate}
+
+\section{Implementation Plan (Order of Operations)}
+\begin{enumerate}[leftmargin=1.25em]
+  \item Build the ED design matrix: offsets \(o_{ik}\) and features \(\vect{x}^{(\EV)}_i,\vect{x}^{(\R)}_i\); standardize features.
+  \item Compute \(T_i, w^{\EV}_i, w^{\R}_i\) for each \((T,\rho)\) scenario.
+  \item Fit compartment models with ridge; select \(\lambda\) via spatial CV.
+  \item Poll-align intercepts using turnout-weighted citywide means; include weak Sliwa share prior.
+  \item Simulate uncertainty across \((T,\rho)\); export ED/AD/borough/city shares with 50/90\% bands; render maps and a short methods note.
+\end{enumerate}
+
+\section{Summary}
+This specification combines (i) fresh \emph{pattern priors} (Dem primary and a weak GOP map), (ii) composition-aware compartment weights derived from observed early voting and conservative E-Day scaling, and (iii) citywide calibration to current polling. The result is an interpretable, stable forecast of \emph{vote shares} that updates coherently as early-vote and registration information evolves.
+
+% ======================================================================
+\section*{Update: Integration Status \& Next Steps (\today)}
+% ======================================================================
+
+\subsection*{What We Have Accomplished}
+\begin{itemize}[leftmargin=1.25em]
+  \item \textbf{Pipeline built and validated end-to-end.} \texttt{build\_base.py}, \texttt{build\_turnout.py}, \texttt{build\_features.py}, and \texttt{fit\_compartment.py} run cleanly with key parity.
+  \item \textbf{Turnout grid ready.} Long-form scenarios \((T,\rho)\in\{1.80,1.94\}\times\{0.4,0.6\}\) with sane \(T_i\), \(w^{\EV}\in[0,1]\), \(w^{\R}=1-w^{\EV}\); city totals match targets.
+  \item \textbf{Offsets finite everywhere.} \(\texttt{pri\_mam\_share}\) and \(\texttt{sliwa21\_share\_eb}\) are clipped before \(\logit\); no \(\pm\infty\).
+  \item \textbf{Forecast artifacts written.} ED/AD/borough/city CSVs per scenario with probabilities summing to 1.\footnotesize~(\texttt{forecast\_ed\_by\_scenario.csv}, \texttt{forecast\_ad\_by\_scenario.csv}, \texttt{forecast\_borough\_by\_scenario.csv}, \texttt{forecast\_city\_by\_scenario.csv})\normalsize
+  \item \textbf{Diagnostics pass.} \texttt{debug\_forecast.py} confirms weights, bounds, and aggregation sanity; citywide calibration equals polling means as designed.
+\end{itemize}
+
+\subsection*{Final Remaining Piece (Visualization \& Publish)}
+\textbf{Goal:} Pipe ED-level results into an interactive map like the \emph{early voting} example and publish to Substack.
+
+\paragraph{Map spec.}
+\begin{itemize}[leftmargin=1.25em]
+  \item \textbf{Color channels (per-candidate layers):}
+    \(\text{Mamdani}\Rightarrow\) \textcolor{MamdaniBlue}{MamdaniBlue},
+    \(\text{Cuomo}\Rightarrow\) \textcolor{CuomoOrange}{CuomoOrange},
+    \(\text{Sliwa}\Rightarrow\) \textcolor{SliwaRed}{SliwaRed}.
+  \item \textbf{Shade by share} \(p_{ik}\) with perceptual lightness (0\%$\to$very light; 50\%$\to$mid; 100\%$\to$full).
+  \item \textbf{Per-scenario toggle} (\texttt{scenario\_tag}); hover tooltip shows \(\texttt{borough, AD, ED}\), \(p_M,p_C,p_S\), \(T_i,w^{\EV},w^{\R}\).
+  \item \textbf{Static export for Substack:} PNG (2x retina) per candidate + a stacked triptych; captions include scenario label and citywide shares.
+\end{itemize}
+
+\paragraph{Minimal implementation sketch.}
+\begin{enumerate}[leftmargin=1.25em]
+  \item Join \(\texttt{forecast\_ed\_by\_scenario.csv}\) to the ED GeoJSON (key: \(\texttt{ed\_uid}\)).
+  \item Build three style functions (one per candidate) mapping \(p_{ik}\to\)fill color using the palette above.
+  \item Add a scenario dropdown; re-style the layer on change (no re-fetch).
+  \item Export static PNGs (Leaflet/Maplibre screenshot or browser print-to-PNG) for Substack.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.95\linewidth]{ny_map.png}
+  \caption{\small Early-vote example map style. Our forecast map will mirror this look-and-feel, with candidate layers colored \textcolor{MamdaniBlue}{blue} (Mamdani), \textcolor{CuomoOrange}{orange} (Cuomo), and \textcolor{SliwaRed}{red} (Sliwa).}
+\end{figure}
+
+\subsection*{Short Checklist to Ship the Map}
+\begin{itemize}[leftmargin=1.25em]
+  \item \([\;]\) Load ED GeoJSON and left-join \texttt{forecast\_ed\_by\_scenario.csv} by \(\texttt{ed\_uid}\).
+  \item \([\;]\) Implement color scales: \textcolor{MamdaniBlue}{MamdaniBlue}, \textcolor{CuomoOrange}{CuomoOrange}, \textcolor{SliwaRed}{SliwaRed}; legend with 0--42\% style ticks to echo the reference.
+  \item \([\;]\) Add scenario selector and hover tooltips (ED keys + \(p_M,p_C,p_S,T_i,w^{\EV}\)).
+  \item \([\;]\) Export static PNGs for Substack (one per candidate + triptych).
+\end{itemize}
+
+\end{document}

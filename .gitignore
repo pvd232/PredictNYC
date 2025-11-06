@@ -1,0 +1,95 @@
+# ----------------------------
+#  OS-Specific & Editor Files
+# ----------------------------
+
+# macOS
+.DS_Store
+
+# VSCode
+.vscode/
+
+# JetBrains (PyCharm, etc.)
+.idea/
+
+# ----------------------------
+#  Python
+# ----------------------------
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+env/
+venv/
+build/
+develop-eggs/
+dist/
+eggs/
+*.egg-info/
+.eggs/
+
+# Virtual environments
+venv/
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+
+# Sphinx documentation
+docs/_build/
+target/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Pyre type checker
+.pyre/
+
+# Mypy
+.mypy_cache/
+
+# ----------------------------
+#  Docker & Container
+# ----------------------------
+
+# Docker build files
+docker-*.log
+*.pid
+*.log
+
+# If you have secrets or environment files
+*.env
+
+
+# ----------------------------
+#  Data
+# ----------------------------
+
+# nyc.votes Dem Primary 2025 Data
+data/dem_primary_data/
+data/original
+out/
+ad_pdfs/
+*.html
+
+# ----------------------------
+#  End of .gitignore
+# ----------------------------

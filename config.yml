@@ -1,0 +1,51 @@
+paths:
+  primary_final: data/primary_final_round_by_ed.csv
+  early_votes: data/ev_by_ed.csv
+  sliwa21: data/mayor_2021_general_by_ed.csv
+  registration: data/reg_by_ed.csv
+  acs: data/acs_by_ed.csv
+  polls: data/original/polls_citywide.csv
+  out_base: out/model_base_by_ed.parquet
+  out_turnout: out/turnout_scenarios.parquet
+  out_features_ev: out/features_ev_by_ed.parquet
+  out_features_r: out/features_r_by_ed.parquet
+
+borough_map:
+  MN: 1
+  BX: 2
+  BK: 3
+  QN: 4
+  SI: 5
+
+late_deciders:
+  mam: 0.57
+  cuo: 0.33
+  sli: 0.1
+
+
+# Scenarios (single block)
+scenarios:
+  T:   [1800000, 1940000]
+  rho: [0.4, 0.6]
+  T_ref: 1940000
+  rho_ref: 0.5
+
+# Priors (2 knobs)
+sliwa_alpha: 0.5
+sliwa_floor: 0.5
+
+# EV vs R contrast
+turnout_elasticity: 1.2   # global multiplier
+sc_see_saw: 0.9           # S up, C down in EV (M neutral)
+couple_sc: 0.3           # optional anti-coupling of C/S during calibration
+
+# Turnout builder
+eday_floor_frac: 0.10
+ev_correction_factor: 1.0
+
+feature_choices:
+  use_student_share: true
+  use_income_percentile: true
+  use_dist_to_ev_site: false
+
+zscore_eps: 1.0e-09
