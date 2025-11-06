@@ -56,3 +56,4 @@ If some columns are not available, leave placeholders; the code will warn and co
 - MECE: pick one from each “or” pair; the default config selects `student_share` and `income_pctl` once and flips sign in E‑Day where needed.
 # PredictNYC
 # PredictNYC
+# PredictNYC
