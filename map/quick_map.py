@@ -16,7 +16,6 @@ PARKS_PATH = "./map/nyc_parks.geojson"  # NYC Open Data Parks Properties
 SCENARIO = None  # e.g. "T1800000_r04"; if None => render ALL scenarios
 OUT_DIR = Path("./map")
 OUT_BASENAME = "results"  # file → ed_map_<tag>.png
-STYLES = "./map/tooltip.css"
 
 # --------------------------------
 
@@ -233,8 +232,6 @@ def render_one(mdf, shapes, parks, tag, static=True):
 
         # Build map
         m = folium.Map(location=[40.71, -73.94], zoom_start=10, tiles="cartodbpositron")
-        # tooltip_css = get_css_as_string(STYLES)
-        # m.get_root().html.add_child(folium.Element(f"<style>{tooltip_css}</style>"))
 
         # ED polygons first so parks can sit on top
         borough_map = {
@@ -279,19 +276,26 @@ def render_one(mdf, shapes, parks, tag, static=True):
         # … build g (your properties) …
 
         # Pretty “Borough AD-ED” label
-        borough_map = {
+        borough_map_long = {
             "BK": "Brooklyn",
             "QN": "Queens",
             "MN": "Manhattan",
-            "SI": "Staten Island",
+            "SI": "Staten Island",  # fix typo
             "BX": "Bronx",
         }
-        s = g["ED_key"].astype(str).str.extract(r"(\d+)")[0].str.zfill(5)
-        g["ED_key"] = g["borough"].map(borough_map) + " " + s.str[:2] + "-" + s.str[-3:]
-        g["hdr_pct"] = "Pct."  # subhead right cell
+
+        # Build a separate display label; do NOT overwrite ED_key
+        g["ed_label"] = (
+            g["borough"].map(borough_map_long) + " " + g["AD"] + "-" + g["ED"]
+        )
+
+        # Later in the tooltip:
+        g["hdr_pct"] = "Pct."
         g["header_html"] = g.apply(
-            lambda r: f'<span class="hdr-nei">{html.escape(str(r.get("neighborhood") or r.get("borough") or ""))}</span>'
-            f'<span class="hdr-ed">{html.escape(str(r.get("ED_key") or ""))}</span>',
+            lambda r: (
+                f'<span class="hdr-nei">{html.escape(str(r.get("neighborhood") or r.get("borough") or ""))}</span>'
+                f'<span class="hdr-ed">{html.escape(str(r.get("ed_label") or ""))}</span>'
+            ),
             axis=1,
         )
 

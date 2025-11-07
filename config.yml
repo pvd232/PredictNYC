@@ -36,8 +36,8 @@ sliwa_floor: 0.5
 
 # EV vs R contrast
 turnout_elasticity: 1.2   # global multiplier
-sc_see_saw: 0.9           # S up, C down in EV (M neutral)
-couple_sc: 0.3           # optional anti-coupling of C/S during calibration
+sc_see_saw: 0.5           # S up, C down in EV (M neutral)
+couple_sc: 0.05           # optional anti-coupling of C/S during calibration
 
 # Turnout builder
 eday_floor_frac: 0.10

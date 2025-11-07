@@ -138,11 +138,6 @@ def main():
     )
     base = base.merge(sl, on=["borough", "AD", "ED", "ed_uid"], how="outer")
     if has_registration:
-        # for _, row in rg.iterrows():
-        #     for _, val in row.items():
-        #         if not val:
-        #             print("row", row)
-
         base = base.merge(rg, on=["borough", "AD", "ED", "ed_uid"], how="left")
     if acs is not None:
         base = base.merge(acs, on=["borough", "AD", "ED", "ed_uid"], how="outer")

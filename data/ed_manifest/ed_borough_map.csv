@@ -910,77 +910,77 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 36,068,QN,Queens,QN-AD36-ED068,Queens
 36,069,QN,Queens,QN-AD36-ED069,Queens
 36,070,QN,Queens,QN-AD36-ED070,Queens
-37,001,MN,Manhattan,MN-AD37-ED001,Long Island City
-37,002,MN,Manhattan,MN-AD37-ED002,Long Island City
-37,003,MN,Manhattan,MN-AD37-ED003,Long Island City
-37,004,MN,Manhattan,MN-AD37-ED004,Long Island City
-37,005,MN,Manhattan,MN-AD37-ED005,Long Island City
-37,006,MN,Manhattan,MN-AD37-ED006,Long Island City
-37,007,MN,Manhattan,MN-AD37-ED007,Long Island City
-37,008,MN,Manhattan,MN-AD37-ED008,Long Island City
-37,009,MN,Manhattan,MN-AD37-ED009,Long Island City
-37,010,MN,Manhattan,MN-AD37-ED010,Long Island City
-37,011,MN,Manhattan,MN-AD37-ED011,Ridgewood
-37,012,MN,Manhattan,MN-AD37-ED012,Ridgewood
-37,013,MN,Manhattan,MN-AD37-ED013,Blissville
-37,014,MN,Manhattan,MN-AD37-ED014,Sunnyside
-37,015,MN,Manhattan,MN-AD37-ED015,Maspeth
-37,016,MN,Manhattan,MN-AD37-ED016,Sunnyside
-37,017,MN,Manhattan,MN-AD37-ED017,Sunnyside
-37,018,MN,Manhattan,MN-AD37-ED018,Sunnyside
-37,019,MN,Manhattan,MN-AD37-ED019,Sunnyside
-37,020,MN,Manhattan,MN-AD37-ED020,Sunnyside
-37,021,MN,Manhattan,MN-AD37-ED021,Sunnyside
-37,022,MN,Manhattan,MN-AD37-ED022,Sunnyside
-37,023,MN,Manhattan,MN-AD37-ED023,Sunnyside
-37,024,MN,Manhattan,MN-AD37-ED024,Sunnyside
-37,025,MN,Manhattan,MN-AD37-ED025,Sunnyside
-37,026,MN,Manhattan,MN-AD37-ED026,Sunnyside
-37,027,MN,Manhattan,MN-AD37-ED027,Sunnyside
-37,028,MN,Manhattan,MN-AD37-ED028,Sunnyside
-37,029,MN,Manhattan,MN-AD37-ED029,Sunnyside
-37,030,MN,Manhattan,MN-AD37-ED030,Sunnyside
-37,031,MN,Manhattan,MN-AD37-ED031,Sunnyside
-37,032,MN,Manhattan,MN-AD37-ED032,Sunnyside
-37,033,MN,Manhattan,MN-AD37-ED033,Sunnyside
-37,034,MN,Manhattan,MN-AD37-ED034,Maspeth
-37,035,MN,Manhattan,MN-AD37-ED035,Sunnyside
-37,036,MN,Manhattan,MN-AD37-ED036,Sunnyside
-37,037,MN,Manhattan,MN-AD37-ED037,Sunnyside
-37,038,MN,Manhattan,MN-AD37-ED038,Manhattan
-37,039,MN,Manhattan,MN-AD37-ED039,Maspeth
-37,040,MN,Manhattan,MN-AD37-ED040,Maspeth
-37,041,MN,Manhattan,MN-AD37-ED041,Maspeth
-37,042,MN,Manhattan,MN-AD37-ED042,Long Island City
-37,043,MN,Manhattan,MN-AD37-ED043,Ridgewood
-37,044,MN,Manhattan,MN-AD37-ED044,Ridgewood
-37,045,MN,Manhattan,MN-AD37-ED045,Ridgewood
-37,046,MN,Manhattan,MN-AD37-ED046,Maspeth
-37,047,MN,Manhattan,MN-AD37-ED047,Maspeth
-37,048,MN,Manhattan,MN-AD37-ED048,Maspeth
-37,049,MN,Manhattan,MN-AD37-ED049,Maspeth
-37,050,MN,Manhattan,MN-AD37-ED050,Ridgewood
-37,051,MN,Manhattan,MN-AD37-ED051,Maspeth
-37,052,MN,Manhattan,MN-AD37-ED052,Ridgewood
-37,053,MN,Manhattan,MN-AD37-ED053,Ridgewood
-37,054,MN,Manhattan,MN-AD37-ED054,Ridgewood
-37,055,MN,Manhattan,MN-AD37-ED055,Ridgewood
-37,056,MN,Manhattan,MN-AD37-ED056,Ridgewood
-37,057,MN,Manhattan,MN-AD37-ED057,Ridgewood
-37,058,MN,Manhattan,MN-AD37-ED058,Ridgewood
-37,059,MN,Manhattan,MN-AD37-ED059,Ridgewood
-37,060,MN,Manhattan,MN-AD37-ED060,Ridgewood
-37,061,MN,Manhattan,MN-AD37-ED061,Ridgewood
-37,062,MN,Manhattan,MN-AD37-ED062,Ridgewood
-37,063,MN,Manhattan,MN-AD37-ED063,Ridgewood
-37,064,MN,Manhattan,MN-AD37-ED064,Ridgewood
-37,065,MN,Manhattan,MN-AD37-ED065,Ridgewood
-37,066,MN,Manhattan,MN-AD37-ED066,Manhattan
+37,001,QN,Queens,QN-AD37-ED001,Long Island City
+37,002,QN,Queens,QN-AD37-ED002,Long Island City
+37,003,QN,Queens,QN-AD37-ED003,Long Island City
+37,004,QN,Queens,QN-AD37-ED004,Long Island City
+37,005,QN,Queens,QN-AD37-ED005,Long Island City
+37,006,QN,Queens,QN-AD37-ED006,Long Island City
+37,007,QN,Queens,QN-AD37-ED007,Long Island City
+37,008,QN,Queens,QN-AD37-ED008,Long Island City
+37,009,QN,Queens,QN-AD37-ED009,Long Island City
+37,010,QN,Queens,QN-AD37-ED010,Long Island City
+37,011,QN,Queens,QN-AD37-ED011,Ridgewood
+37,012,QN,Queens,QN-AD37-ED012,Ridgewood
+37,013,QN,Queens,QN-AD37-ED013,Blissville
+37,014,QN,Queens,QN-AD37-ED014,Sunnyside
+37,015,QN,Queens,QN-AD37-ED015,Maspeth
+37,016,QN,Queens,QN-AD37-ED016,Sunnyside
+37,017,QN,Queens,QN-AD37-ED017,Sunnyside
+37,018,QN,Queens,QN-AD37-ED018,Sunnyside
+37,019,QN,Queens,QN-AD37-ED019,Sunnyside
+37,020,QN,Queens,QN-AD37-ED020,Sunnyside
+37,021,QN,Queens,QN-AD37-ED021,Sunnyside
+37,022,QN,Queens,QN-AD37-ED022,Sunnyside
+37,023,QN,Queens,QN-AD37-ED023,Sunnyside
+37,024,QN,Queens,QN-AD37-ED024,Sunnyside
+37,025,QN,Queens,QN-AD37-ED025,Sunnyside
+37,026,QN,Queens,QN-AD37-ED026,Sunnyside
+37,027,QN,Queens,QN-AD37-ED027,Sunnyside
+37,028,QN,Queens,QN-AD37-ED028,Sunnyside
+37,029,QN,Queens,QN-AD37-ED029,Sunnyside
+37,030,QN,Queens,QN-AD37-ED030,Sunnyside
+37,031,QN,Queens,QN-AD37-ED031,Sunnyside
+37,032,QN,Queens,QN-AD37-ED032,Sunnyside
+37,033,QN,Queens,QN-AD37-ED033,Sunnyside
+37,034,QN,Queens,QN-AD37-ED034,Maspeth
+37,035,QN,Queens,QN-AD37-ED035,Sunnyside
+37,036,QN,Queens,QN-AD37-ED036,Sunnyside
+37,037,QN,Queens,QN-AD37-ED037,Sunnyside
+37,038,QN,Queens,QN-AD37-ED038,Manhattan
+37,039,QN,Queens,QN-AD37-ED039,Maspeth
+37,040,QN,Queens,QN-AD37-ED040,Maspeth
+37,041,QN,Queens,QN-AD37-ED041,Maspeth
+37,042,QN,Queens,QN-AD37-ED042,Long Island City
+37,043,QN,Queens,QN-AD37-ED043,Ridgewood
+37,044,QN,Queens,QN-AD37-ED044,Ridgewood
+37,045,QN,Queens,QN-AD37-ED045,Ridgewood
+37,046,QN,Queens,QN-AD37-ED046,Maspeth
+37,047,QN,Queens,QN-AD37-ED047,Maspeth
+37,048,QN,Queens,QN-AD37-ED048,Maspeth
+37,049,QN,Queens,QN-AD37-ED049,Maspeth
+37,050,QN,Queens,QN-AD37-ED050,Ridgewood
+37,051,QN,Queens,QN-AD37-ED051,Maspeth
+37,052,QN,Queens,QN-AD37-ED052,Ridgewood
+37,053,QN,Queens,QN-AD37-ED053,Ridgewood
+37,054,QN,Queens,QN-AD37-ED054,Ridgewood
+37,055,QN,Queens,QN-AD37-ED055,Ridgewood
+37,056,QN,Queens,QN-AD37-ED056,Ridgewood
+37,057,QN,Queens,QN-AD37-ED057,Ridgewood
+37,058,QN,Queens,QN-AD37-ED058,Ridgewood
+37,059,QN,Queens,QN-AD37-ED059,Ridgewood
+37,060,QN,Queens,QN-AD37-ED060,Ridgewood
+37,061,QN,Queens,QN-AD37-ED061,Ridgewood
+37,062,QN,Queens,QN-AD37-ED062,Ridgewood
+37,063,QN,Queens,QN-AD37-ED063,Ridgewood
+37,064,QN,Queens,QN-AD37-ED064,Ridgewood
+37,065,QN,Queens,QN-AD37-ED065,Ridgewood
 37,067,MN,Manhattan,MN-AD37-ED067,Manhattan
-37,068,MN,Manhattan,MN-AD37-ED068,Manhattan
-37,069,MN,Manhattan,MN-AD37-ED069,Manhattan
-37,070,MN,Manhattan,MN-AD37-ED070,Manhattan
-37,071,MN,Manhattan,MN-AD37-ED071,Manhattan
+37,067,QN,Queens,QN-AD37-ED067,Manhattan
+37,068,QN,Queens,QN-AD37-ED068,Manhattan
+37,069,QN,Queens,QN-AD37-ED069,Manhattan
+37,070,QN,Queens,QN-AD37-ED070,Manhattan
+37,071,QN,Queens,QN-AD37-ED071,Manhattan
 38,001,QN,Queens,QN-AD38-ED001,Ridgewood
 38,002,QN,Queens,QN-AD38-ED002,Ridgewood
 38,003,QN,Queens,QN-AD38-ED003,Ridgewood
