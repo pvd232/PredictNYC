@@ -92,7 +92,6 @@ def main():
     polls["andrew_cuomo"] += cuo_share * rem
     polls["curtis_sliwa"] += sli_share * rem
 
-
     # Standardize keys (skip optional None frames)
     for df, name in (
         [(pri, "primary"), (ev, "early_votes"), (sl, "sliwa21")]
@@ -138,8 +137,13 @@ def main():
         ev, on=["borough", "AD", "ED", "ed_uid"], how="outer", suffixes=("", "")
     )
     base = base.merge(sl, on=["borough", "AD", "ED", "ed_uid"], how="outer")
-    # if has_registration:
-    #     base = base.merge(rg, on=["borough", "AD", "ED", "ed_uid"], how="outer")
+    if has_registration:
+        # for _, row in rg.iterrows():
+        #     for _, val in row.items():
+        #         if not val:
+        #             print("row", row)
+
+        base = base.merge(rg, on=["borough", "AD", "ED", "ed_uid"], how="left")
     if acs is not None:
         base = base.merge(acs, on=["borough", "AD", "ED", "ed_uid"], how="outer")
 
@@ -147,9 +151,9 @@ def main():
     for c in ["reg_dem", "reg_rep", "reg_oth"]:
         if c not in base.columns:
             base[c] = np.nan
-    
+
     # --- Build Sliwa EB-smoothed proxy ---
-    
+
     # Use two-party total if available, else fall back to Total21 for EB weight
     count_col = "two_party_total" if "two_party_total" in base.columns else "Total21"
     # If count_col is entirely missing or zero, create a minimal positive count to avoid zero weights

@@ -451,7 +451,7 @@ def main():
     sys.stderr.write(f"Done. OK={n_ok}, ERR={n_err}. Rows={len(out_df)} → {args.out}\n")
 
     # Uncomment to remove excess inferred_boroughs_from_pdf column
-    trim_cols(args.out)
+    # trim_cols(args.out)
 
 
 if __name__ == "__main__":

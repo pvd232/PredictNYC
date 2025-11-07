@@ -1,9 +1,9 @@
 # early_votes_parser.py
 import pandas as pd
 
-IN_CSV = "../data/original/thecity_ev_dataset.csv"
-OUT_CSV = "../data/ev_by_ed.csv"
-
+IN_CSV = "./data/original/thecity_ev_dataset.csv"
+OUT_CSV = "./data/ev_by_ed.csv"
+MAP = "./data/ed_manifest/ed_borough_map.csv"
 df = pd.read_csv(IN_CSV)
 
 # normalize column names
@@ -62,7 +62,7 @@ def to_code(x):
     return s if s in valid else None
 
 
-m = pd.read_csv("../data/ed_manifest/ed_borough_map.csv", dtype=str)
+m = pd.read_csv(MAP, dtype=str)
 
 if "borough" not in m.columns and "borough_code" in m.columns:
     m["borough"] = m["borough_code"]
@@ -107,7 +107,8 @@ out = pd.DataFrame(
     {
         "ED": df["ED"].values,
         "AD": df["AD"].values,
-        "borough": df["borough"].values,  # already normalized to codes
+        "borough": df["borough"].values,  # already normalized to codes,
+        "neighborhood": df["name"].values,
         "ev25_total": ev25_total,
         "ev_rate": ev_rate,
         "ev_weight": ev_weight,
@@ -142,3 +143,41 @@ assert (
 out.to_csv(OUT_CSV, index=False)
 print(f"✅ Wrote {len(out):,} rows → {OUT_CSV}")
 print(out.head())
+
+
+# Optional, add neighborhood to MASTER ED/AD/borough file
+def update_ed_borough_mapping():
+    m_new = pd.read_csv(MAP, dtype=str)
+    out_copy = out.rename(columns={"borough": "borough_code"})
+
+    def norm_keys(df):
+        df = df.copy()
+        df["AD"] = (
+            pd.to_numeric(df["AD"], errors="coerce")
+            .astype("Int64")
+            .astype(str)
+            .str.zfill(2)
+        )
+        df["ED"] = (
+            pd.to_numeric(df["ED"], errors="coerce")
+            .astype("Int64")
+            .astype(str)
+            .str.zfill(3)
+        )
+        return df
+
+    out_copy = norm_keys(out_copy)
+    m_new = norm_keys(m_new)
+
+    out_copy["borough"] = m_new["borough_name"]
+    m_new = m_new.rename(columns={"borough_name": "borough"})
+
+    mm = m_new.merge(
+        out_copy[["ED", "AD", "borough_code", "neighborhood"]],
+        how="left",
+        on=["ED", "AD", "borough_code"],
+    ).assign(neighborhood=lambda d: d["neighborhood"].fillna(d["borough"]))
+    mm.to_csv("./data/ed_manifest/ed_borough_map.csv", index=False)
+
+
+update_ed_borough_mapping()

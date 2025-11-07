@@ -26,21 +26,8 @@ def borough_to_id(borough, mapping):
     except:
         raise ValueError(f"Unrecognized borough: {borough}")
 
-# def make_ed_uid(df,mapping):
-#     print("mapping", mapping)
-#     boro_col = df["borough"].apply(lambda x: borough_to_id(x, mapping))
-#     ad_num = df["AD"].astype(int)
-#     print("ad_num", ad_num)
-#     ed_num = df["ED"].astype(int)
-#     ad = f"{ad_num:02d}"  # 2 digits: 01..87
-#     ed = f"{ed_num:03d}"  # 3 digits: 001..200+
-#     return f"{boro_col}-AD{ad}-ED{ed}"
-
 
 def make_ed_uid(df, mapping):
-    print("mapping", mapping)
-    
-
     boro = (
         df["borough"].apply(lambda x: borough_to_id(x, mapping)).astype(str).str.strip()
     )

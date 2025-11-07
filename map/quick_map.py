@@ -7,6 +7,7 @@ from pathlib import Path
 from shapely.geometry import mapping
 import argparse
 import folium
+import html
 
 # ---------- CONFIG ----------
 ED_FORECAST_CSV = "./out/forecast_ed_by_scenario.csv"
@@ -15,7 +16,74 @@ PARKS_PATH = "./map/nyc_parks.geojson"  # NYC Open Data Parks Properties
 SCENARIO = None  # e.g. "T1800000_r04"; if None => render ALL scenarios
 OUT_DIR = Path("./map")
 OUT_BASENAME = "results"  # file → ed_map_<tag>.png
+STYLES = "./map/tooltip.css"
+
 # --------------------------------
+
+from branca.element import MacroElement, Template
+
+
+def inject_tooltip_css(m):
+    css = """
+    <style>
+    /* Container */
+    .leaflet-tooltip.nyt-tooltip{
+      padding:12px 14px; border:0; border-radius:12px;
+      background:rgba(255,255,255,0.96) !important;
+      box-shadow:0 10px 28px rgba(0,0,0,.18);
+      color:#111827; z-index:99999;
+    }
+    .leaflet-tooltip.nyt-tooltip .leaflet-tooltip-content{ margin:0; }
+
+    /* Table Folium emits when labels=True */
+    .nyt-tooltip table{
+      border-collapse:collapse;
+      font:600 13px/1.25 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    }
+    .nyt-tooltip .hdr-nei { font-weight:700; }            /* “Greenpoint” */
+    .nyt-tooltip .hdr-ed  { color:#9ca3af; font-weight:600; } /* “Brooklyn 50-010” */
+    
+    /* Row 1: ED title */
+    .nyt-tooltip tbody tr:nth-child(1) th{ 
+      display: none;
+    }
+    .nyt-tooltip tbody tr:nth-child(1) td{ 
+        display: flex;
+        align-items: baseline;
+        justify-content: flex-start;  
+        gap: 10px;
+        padding-left: 0;              
+        width: 100%;
+        text-align: left;
+    }
+
+    /* Row 2: subhead “Candidate | Pct.” */
+    .nyt-tooltip tbody tr:nth-child(2) th,
+    .nyt-tooltip tbody tr:nth-child(2) td{
+      color:#9ca3af; font-weight:600; /* gray-400 */
+    }
+
+    /* Dividers before candidate rows (rows 3–5) */
+    .nyt-tooltip tbody tr:nth-child(n+3){ border-top:1px solid #e5e7eb; } /* gray-200 */
+
+    /* Candidate names: light gray, not bold */
+    .nyt-tooltip tbody tr:nth-child(n+3) th{ color:#6b7280; font-weight:500; } /* gray-500 */
+
+    /* Percentages darker */
+    .nyt-tooltip tbody tr:nth-child(n+3) td{ color:#111827; font-weight:600; }
+
+    /* Left color bullets for rows 3..5 */
+    .nyt-tooltip tbody tr:nth-child(n+3) th::before{
+      content:""; display:inline-block; width:8px; height:8px; margin-right:6px;
+      border-radius:999px; transform:translateY(-1px);
+    }
+    /* Row mapping: 3=Mamdani, 4=Cuomo, 5=Sliwa */
+    .nyt-tooltip tbody tr:nth-child(3) th::before{ background:#3182bd; } /* Mamdani (blue) */
+    .nyt-tooltip tbody tr:nth-child(4) th::before{ background:#31a354; } /* Cuomo  (green) */
+    .nyt-tooltip tbody tr:nth-child(5) th::before{ background:#de2d26; } /* Sliwa  (red) */
+    </style>
+    """
+    m.get_root().header.add_child(folium.Element(css))
 
 
 # --- helpers ---
@@ -91,9 +159,22 @@ def render_one(mdf, shapes, parks, tag, static=True):
     mdf["ED_key"] = parse_uid(mdf["ed_uid"])
     mdf["winner"], mdf["margin"], mdf["runner_idx"] = winner_and_margin(mdf)
 
-    # merge with polygons 
+    # merge with polygons
     geo = shapes.merge(
-        mdf[["ED_key", "borough", "margin", "runner_idx", "p_M", "p_C", "p_S"]],
+        mdf[
+            [
+                "ED",
+                "AD",
+                "ED_key",
+                "borough",
+                "margin",
+                "winner",
+                "runner_idx",
+                "p_M",
+                "p_C",
+                "p_S",
+            ]
+        ],
         on="ED_key",
         how="left",
     )
@@ -127,11 +208,14 @@ def render_one(mdf, shapes, parks, tag, static=True):
 
         # Minimal properties to avoid JSON serialization issues
         keep = [
+            "ED",
+            "AD",
             "ED_key",
             "p_M_pct",
             "p_C_pct",
             "p_S_pct",
-            "borough", 
+            "borough",
+            "neighborhood",
             "fill",
             "geometry",
         ]
@@ -149,16 +233,10 @@ def render_one(mdf, shapes, parks, tag, static=True):
 
         # Build map
         m = folium.Map(location=[40.71, -73.94], zoom_start=10, tiles="cartodbpositron")
+        # tooltip_css = get_css_as_string(STYLES)
+        # m.get_root().html.add_child(folium.Element(f"<style>{tooltip_css}</style>"))
 
         # ED polygons first so parks can sit on top
-        fields = [
-            c
-            for c in ["ED_key", "p_M_pct", "p_C_pct", "p_S_pct"]
-            if c in g.columns
-        ]
-        aliases = ["ED",   "Mamdani", "Cuomo", "Sliwa"][
-            : len(fields)
-        ]
         borough_map = {
             "BK": "Brooklyn",
             "QN": "Queens",
@@ -166,19 +244,78 @@ def render_one(mdf, shapes, parks, tag, static=True):
             "SI": "Statan Island",
             "BX": "Bronx",
         }
+
+        def norm_keys(df):
+            df = df.copy()
+            print("df", df)
+            df["AD"] = (
+                pd.to_numeric(df["AD"], errors="coerce")
+                .astype("Int64")
+                .astype(str)
+                .str.zfill(2)
+            )
+            df["ED"] = (
+                pd.to_numeric(df["ED"], errors="coerce")
+                .astype("Int64")
+                .astype(str)
+                .str.zfill(3)
+            )
+            return df
+
         s = g["ED_key"].astype(str).str.extract(r"(\d+)")[0].str.zfill(5)
         g["ED_key"] = g["borough"].map(borough_map) + " " + s.str[:2] + "-" + s.str[-3:]
 
-        folium.GeoJson(
+        b_map = norm_keys(pd.read_csv("./data/ed_manifest/ed_borough_map.csv"))
+        g = norm_keys(g)
+        g = g.merge(b_map[["neighborhood", "ED", "AD"]], how="left", on=["ED", "AD"])
+
+        # Add a fake header row: "Candidate"  |  "Pct."
+        g["hdr_pct"] = "Pct."  # constant text for the subheader row
+
+        # Build map
+        m = folium.Map(location=[40.71, -73.94], zoom_start=10, tiles="cartodbpositron")
+        inject_tooltip_css(m)  # <— injects CSS correctly
+
+        # … build g (your properties) …
+
+        # Pretty “Borough AD-ED” label
+        borough_map = {
+            "BK": "Brooklyn",
+            "QN": "Queens",
+            "MN": "Manhattan",
+            "SI": "Staten Island",
+            "BX": "Bronx",
+        }
+        s = g["ED_key"].astype(str).str.extract(r"(\d+)")[0].str.zfill(5)
+        g["ED_key"] = g["borough"].map(borough_map) + " " + s.str[:2] + "-" + s.str[-3:]
+        g["hdr_pct"] = "Pct."  # subhead right cell
+        g["header_html"] = g.apply(
+            lambda r: f'<span class="hdr-nei">{html.escape(str(r.get("neighborhood") or r.get("borough") or ""))}</span>'
+            f'<span class="hdr-ed">{html.escape(str(r.get("ED_key") or ""))}</span>',
+            axis=1,
+        )
+
+        fields = ["header_html", "hdr_pct", "p_M_pct", "p_C_pct", "p_S_pct"]
+        aliases = ["", "Candidate", "Mamdani", "Cuomo", "Sliwa"]
+
+        gj = folium.GeoJson(
             g,
             name=f"EDs ({tag})",
             style_function=style_fn,
             tooltip=folium.GeoJsonTooltip(
-                fields=fields, aliases=aliases, sticky=False, labels=True
+                fields=fields,
+                aliases=aliases,
+                labels=True,
+                sticky=False,
+                class_name="nyt-tooltip",
             ),
-            highlight_function=None,
-            zoom_on_click=False,
-        ).add_to(m)
+            highlight_function=lambda feat: {
+                "weight": 0.2,
+                "color": "white",
+                "fillOpacity": 0.85,
+            },
+        )
+        gj.add_to(m)
 
         # Parks overlay
         if parks is not None and not parks.empty:
@@ -186,12 +323,18 @@ def render_one(mdf, shapes, parks, tag, static=True):
                 if hasattr(parks.geometry, "is_valid"):
                     bad = ~parks.geometry.is_valid
                     if bad.any():
-                        parks.loc[bad, "geometry"] = parks.loc[bad, "geometry"].buffer(0)
+                        parks.loc[bad, "geometry"] = parks.loc[bad, "geometry"].buffer(
+                            0
+                        )
                 parks = parks[parks.geometry.notnull()].copy()
-                p_features = [{"type":"Feature","geometry":mapping(geom),"properties":{}} for geom in parks.geometry]
-                parks = {"type":"FeatureCollection","features":p_features}
+                p_features = [
+                    {"type": "Feature", "geometry": mapping(geom), "properties": {}}
+                    for geom in parks.geometry
+                ]
+                parks = {"type": "FeatureCollection", "features": p_features}
             except Exception as e:
                 print(f"⚠️ Could not add parks overlay: {e}")
+
             def park_style(_):
                 return {
                     "fillColor": "#cfcfcf",
@@ -275,7 +418,7 @@ def render_one(mdf, shapes, parks, tag, static=True):
 
 
 def main():
-    ap = argparse.ArgumentParser(        )
+    ap = argparse.ArgumentParser()
     ap.add_argument("--static", default="True")
     args = ap.parse_args()
     static = args.static
