@@ -18,9 +18,9 @@ borough_map:
   SI: 5
 
 late_deciders:
-  mam: 0.57
-  cuo: 0.33
-  sli: 0.1
+  mam: 0.58
+  cuo: 0.39
+  sli: 0.03
 
 
 # Scenarios (single block)
@@ -31,8 +31,8 @@ scenarios:
   rho_ref: 0.5
 
 # Priors (2 knobs)
-sliwa_alpha: 0.5
-sliwa_floor: 0.5
+sliwa_alpha: 0.0
+sliwa_floor: 0.0
 
 # EV vs R contrast
 turnout_elasticity: 1.2   # global multiplier

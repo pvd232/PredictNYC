@@ -318,6 +318,7 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 27,063,QN,Queens,QN-AD27-ED063,Queens
 27,064,QN,Queens,QN-AD27-ED064,Queens
 27,065,QN,Queens,QN-AD27-ED065,Queens
+27,066,QN,Queens,QN-AD27-ED066,Queens
 27,067,QN,Queens,QN-AD27-ED067,Queens
 27,068,QN,Queens,QN-AD27-ED068,Queens
 28,001,QN,Queens,QN-AD28-ED001,Kew Gardens
@@ -947,7 +948,7 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 37,035,QN,Queens,QN-AD37-ED035,Sunnyside
 37,036,QN,Queens,QN-AD37-ED036,Sunnyside
 37,037,QN,Queens,QN-AD37-ED037,Sunnyside
-37,038,QN,Queens,QN-AD37-ED038,Manhattan
+37,038,QN,Queens,QN-AD37-ED038,Ozone Park
 37,039,QN,Queens,QN-AD37-ED039,Maspeth
 37,040,QN,Queens,QN-AD37-ED040,Maspeth
 37,041,QN,Queens,QN-AD37-ED041,Maspeth
@@ -975,12 +976,12 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 37,063,QN,Queens,QN-AD37-ED063,Ridgewood
 37,064,QN,Queens,QN-AD37-ED064,Ridgewood
 37,065,QN,Queens,QN-AD37-ED065,Ridgewood
-37,067,MN,Manhattan,MN-AD37-ED067,Manhattan
-37,067,QN,Queens,QN-AD37-ED067,Manhattan
-37,068,QN,Queens,QN-AD37-ED068,Manhattan
-37,069,QN,Queens,QN-AD37-ED069,Manhattan
-37,070,QN,Queens,QN-AD37-ED070,Manhattan
-37,071,QN,Queens,QN-AD37-ED071,Manhattan
+37,066,MN,Manhattan,MN-AD37-ED066,Manhattan
+37,067,QN,Queens,QN-AD37-ED067,Queens
+37,068,QN,Queens,QN-AD37-ED068,Queens
+37,069,QN,Queens,QN-AD37-ED069,Queens
+37,070,QN,Queens,QN-AD37-ED070,Queens
+37,071,QN,Queens,QN-AD37-ED071,Queens
 38,001,QN,Queens,QN-AD38-ED001,Ridgewood
 38,002,QN,Queens,QN-AD38-ED002,Ridgewood
 38,003,QN,Queens,QN-AD38-ED003,Ridgewood
@@ -4205,6 +4206,7 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 85,054,BX,Bronx,BX-AD85-ED054,Bronx
 85,055,BX,Bronx,BX-AD85-ED055,Bronx
 85,056,BX,Bronx,BX-AD85-ED056,Bronx
+85,057,BX,Bronx,BX-AD85-ED057,Bronx
 85,058,BX,Bronx,BX-AD85-ED058,Bronx
 85,059,BX,Bronx,BX-AD85-ED059,Bronx
 85,060,BX,Bronx,BX-AD85-ED060,Bronx
@@ -4226,6 +4228,7 @@ AD,ED,borough_code,borough,ed_uid,neighborhood
 85,076,BX,Bronx,BX-AD85-ED076,Bronx
 85,077,BX,Bronx,BX-AD85-ED077,Bronx
 85,078,BX,Bronx,BX-AD85-ED078,Bronx
+85,079,BX,Bronx,BX-AD85-ED079,Bronx
 85,080,BX,Bronx,BX-AD85-ED080,Bronx
 85,081,BX,Bronx,BX-AD85-ED081,Bronx
 86,001,BX,Bronx,BX-AD86-ED001,Morris Heights
